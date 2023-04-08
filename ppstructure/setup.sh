@@ -33,6 +33,12 @@
 
 # https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/doc/doc_en/inference_ppocr_en.md
 
+#  https://github.com/PaddlePaddle/PaddleOCR/tree/release/2.6/ppstructure/layout
+
+
+# Layout model inference - https://github.com/PaddlePaddle/PaddleOCR/tree/release/2.6/ppstructure/layout
+# https://github.com/PaddlePaddle/PaddleOCR/tree/release/2.6/ppstructure/layout
+
 pip install paddle2onnx
 pip install onnxruntime-gpu
 mkdir inference && cd inference
@@ -78,3 +84,24 @@ paddle2onnx --model_dir ./inference/picodet_lcnet_x1_0_layout_infer \
 --opset_version 10 \
 --input_shape_dict="{'x':[-1,3,-1,-1]}" \
 --enable_onnx_checker True
+
+
+
+
+
+
+### Read this carefully - https://github.com/PaddlePaddle/PaddleOCR/tree/release/2.6/ppstructure/layout#72-model-inference
+
+### Enabl
+
+# python3 tools/export_model.py \
+#     -c configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml \
+#     --slim_config configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x2_5_layout.yml \
+#     -o weights=./output/picodet_lcnet_x2_5_layout/best_model \
+#     --output_dir=output_inference/
+
+
+# python3 deploy/python/infer.py \
+#     --model_dir=output_inference/picodet_lcnet_x1_0_layout/ \
+#     --image_file=docs/images/layout.jpg \
+#     --device=CPU

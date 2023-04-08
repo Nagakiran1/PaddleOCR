@@ -31,6 +31,8 @@
 
 # # model_conversion -  https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/deploy/paddle2onnx/readme.md#2-model-conversion
 
+# https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/doc/doc_en/inference_ppocr_en.md
+
 pip install paddle2onnx
 pip install onnxruntime-gpu
 mkdir inference && cd inference

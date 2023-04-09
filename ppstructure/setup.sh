@@ -78,8 +78,8 @@ paddle2onnx --model_dir ./inference/ch_ppstructure_mobile_v2.0_SLANet_infer \
 --enable_onnx_checker True
 
 paddle2onnx --model_dir ./inference/picodet_lcnet_x1_0_layout_infer \
---model_filename inference.pdmodel \
---params_filename inference.pdiparams \
+--model_filename model.pdmodel \
+--params_filename model.pdiparams \
 --save_file ./inference/picodet_lcnet_x1_0_layout_infer/model.onnx \
 --opset_version 10 \
 --input_shape_dict="{'x':[-1,3,-1,-1]}" \

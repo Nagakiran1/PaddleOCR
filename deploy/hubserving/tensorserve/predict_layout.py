@@ -43,18 +43,6 @@ logger = get_logger()
 from operators import *
 
 import copy
-# from imgaug.label_ops import *
-
-# from imgaug.east_process import *
-# from imgaug.sast_process import *
-# from imgaug.pg_process import *
-# from imgaug.table_ops import *
-
-# from imgaug.vqa import *
-
-# from imgaug.fce_aug import *
-# from imgaug.fce_targets import FCENetTargets
-# from imgaug.ct_process import *
 
 def transform(data, ops=None):
     """ transform """
@@ -213,5 +201,18 @@ def main(args):
         logger.info("Predict time of {}: {}".format(image_file, elapse))
 
 
-if __name__ == "__main__":
-    main(parse_args())
+# if __name__ == "__main__":
+#     main(parse_args())
+
+
+
+
+
+
+
+
+
+
+
+
+

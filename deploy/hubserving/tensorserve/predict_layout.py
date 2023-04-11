@@ -157,8 +157,9 @@ class LayoutPredictor(object):
         starttime = time.time()
 
         self.input_tensor.copy_from_cpu(img)
-        self.predictor.run()
-
+        # self.predictor.run()
+        # self.predictor.get_output_names = tritoinclient.request()
+        
         np_score_list, np_boxes_list = [], []
         output_names = self.predictor.get_output_names()
         num_outs = int(len(output_names) / 2)
@@ -201,8 +202,8 @@ def main(args):
         logger.info("Predict time of {}: {}".format(image_file, elapse))
 
 
-# if __name__ == "__main__":
-#     main(parse_args())
+if __name__ == "__main__":
+    main(parse_args())
 
 
 

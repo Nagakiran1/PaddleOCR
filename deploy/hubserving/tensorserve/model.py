@@ -381,7 +381,7 @@ class TritonPythonModel:
 
         # Get OUTPUT2 configuration
         output2_config = pb_utils.get_output_config_by_name(
-            model_config, "pred_id ")
+            model_config, "pred_id")
         
         # Convert Triton types to numpy types
         self.output0_dtype = pb_utils.triton_string_to_numpy(

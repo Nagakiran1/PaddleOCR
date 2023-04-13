@@ -145,6 +145,8 @@ def init_args():
 
     parser.add_argument("--show_log", type=str2bool, default=True)
     parser.add_argument("--use_onnx", type=str2bool, default=False)
+    parser.add_argument("--use_triton", type=str2bool, default=False)
+    parser.add_argument("--triton_url", type=str, default=False)
     return parser
 
 

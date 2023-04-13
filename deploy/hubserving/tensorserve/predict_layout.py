@@ -37,7 +37,7 @@ logger = get_logger()
 
 
 
-
+from triton_client import triton_repo
 
 
 from operators import *
@@ -137,9 +137,17 @@ class LayoutPredictor(object):
         }
 
         self.preprocess_op = create_operators(pre_process_list)
-        self.postprocess_op = build_post_process(postprocess_params)
+        self.postprocess_op = build_post_process(postprocess_params) 
         self.predictor, self.input_tensor, self.output_tensors, self.config = \
             utility.create_predictor(args, 'layout', logger)
+            
+        if args.use_triton:
+            self.args = args
+            self.tc = triton_repo(
+                URL = args.triton_url,
+                model_name = 'layout_onnx',
+                model_version = '1'
+                )
 
     def __call__(self, img):
         ori_im = img.copy()
@@ -156,20 +164,38 @@ class LayoutPredictor(object):
         preds, elapse = 0, 1
         starttime = time.time()
 
-        self.input_tensor.copy_from_cpu(img)
-        # self.predictor.run()
-        # self.predictor.get_output_names = tritoinclient.request()
+        if self.args.use_triton:
+            res = self.tc.triton_inference(inputs={'image':img})
+            output_names = ['transpose_0.tmp_0', 
+                            'transpose_2.tmp_0', 
+                            'transpose_4.tmp_0', 
+                            'transpose_6.tmp_0', 
+                            'transpose_1.tmp_0', 
+                            'transpose_3.tmp_0', 
+                            'transpose_5.tmp_0', 
+                            'transpose_7.tmp_0']
+            
+        else:
+            self.input_tensor.copy_from_cpu(img)
+            self.predictor.run()
+            output_names = self.predictor.get_output_names()
         
         np_score_list, np_boxes_list = [], []
-        output_names = self.predictor.get_output_names()
         num_outs = int(len(output_names) / 2)
         for out_idx in range(num_outs):
-            np_score_list.append(
-                self.predictor.get_output_handle(output_names[out_idx])
-                .copy_to_cpu())
-            np_boxes_list.append(
-                self.predictor.get_output_handle(output_names[
-                    out_idx + num_outs]).copy_to_cpu())
+            if not self.args.use_triton:
+                np_score_list.append(
+                    self.predictor.get_output_handle(output_names[out_idx])
+                    .copy_to_cpu())
+                np_boxes_list.append(
+                    self.predictor.get_output_handle(output_names[
+                        out_idx + num_outs]).copy_to_cpu())
+            else:
+                np_score_list.append(
+                    res.as_numpy(output_names[out_idx]))
+                np_boxes_list.append(
+                    res.as_numpy(output_names[out_idx + num_outs]))
+                
         preds = dict(boxes=np_score_list, boxes_num=np_boxes_list)
 
         post_preds = self.postprocess_op(ori_im, img, preds)

@@ -192,6 +192,8 @@ class LayoutPredictor(hub.Module):
         cfg.ir_optim = True
         cfg.enable_mkldnn = enable_mkldnn
         cfg.use_onnx=True
+        cfg.use_triton = True
+        cfg.triton_url = 'localhost:8001'
         self.layout_predictor = _LayoutPredictor(cfg)
 
     def merge_configs(self):
@@ -273,16 +275,19 @@ if __name__ == '__main__':
     input_images = layout.read_images(paths=image_path)
     res = layout.predict(predicted_data=input_images)
     
-    label_map = {'text':0 ,'title': 1 ,  'list':2, 'table':3, 'figure':4}
-    im_bbox = []
-    im_ids = []
-    im_class = []
-    for im_id, im_res in enumerate(res):
-        for bound_id in range(len(im_res['layout'])):
-            im_bbox.append(im_res['layout'][bound_id]['bbox'])
-            im_class.append(label_map[im_res['layout'][bound_id]['label']])
-            im_ids.append(im_id)
-    im_bbox = np.vstack(im_bbox)
-    im_ids = np.vstack(im_ids)
-    im_class = np.vstack(im_class)
+    # label_map = {'text':0 ,'title': 1 ,  'list':2, 'table':3, 'figure':4}
+    # im_bbox = []
+    # im_ids = []
+    # im_class = []
+    # for im_id, im_res in enumerate(res):
+    #     for bound_id in range(len(im_res['layout'])):
+    #         im_bbox.append(im_res['layout'][bound_id]['bbox'])
+    #         im_class.append(label_map[im_res['layout'][bound_id]['label']])
+    #         im_ids.append(im_id)
+    # im_bbox = np.vstack(im_bbox)
+    # im_ids = np.vstack(im_ids)
+    # im_class = np.vstack(im_class)
     
+    # print(im_bbox.shape)
+    # print(im_ids).shape
+    print(res)

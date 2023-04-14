@@ -109,6 +109,14 @@ class TableStructurer(object):
                 ],
                 warmup=0,
                 logger=logger)
+                   
+        if args.use_triton:
+            self.args = args
+            self.tc = triton_repo(
+                URL = args.triton_url,
+                model_name = 'layout_onnx',
+                model_version = '1'
+                )
 
     def __call__(self, img):
         starttime = time.time()
@@ -125,6 +133,17 @@ class TableStructurer(object):
         img = img.copy()
         if self.args.benchmark:
             self.autolog.times.stamp()
+        
+        if self.args.use_triton:
+            res = self.tc.triton_inference(inputs={'image':img})
+            output_names = ['transpose_0.tmp_0', 
+                            'transpose_2.tmp_0', 
+                            'transpose_4.tmp_0', 
+                            'transpose_6.tmp_0', 
+                            'transpose_1.tmp_0', 
+                            'transpose_3.tmp_0', 
+                            'transpose_5.tmp_0', 
+                            'transpose_7.tmp_0']
         if self.use_onnx:
             input_dict = {}
             input_dict[self.input_tensor.name] = img

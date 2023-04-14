@@ -99,6 +99,8 @@ def init_args():
         default=False,
         help='Whether to use pdf2docx api')
 
+    parser.add_argument("--use_triton", type=str2bool, default=False)
+    parser.add_argument("--triton_url", type=str, default=False)
     return parser
 
 
@@ -106,12 +108,11 @@ def parse_args():
     parser = init_args()
     return parser.parse_args()
 
-
 def draw_structure_result(image, result, font_path):
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
     boxes, txts, scores = [], [], []
-
+    
     img_layout = image.copy()
     draw_layout = ImageDraw.Draw(img_layout)
     text_color = (255, 255, 255)

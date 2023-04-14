@@ -134,7 +134,6 @@ class TableSystem(hub.Module):
         results = self.predict(images_decode, **kwargs)
         return results
 
-
 if __name__ == '__main__':
     table_system = TableSystem()
     table_system._initialize()

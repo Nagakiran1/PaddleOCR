@@ -95,7 +95,7 @@ def init_args():
         default="./ppocr/utils/ppocr_keys_v1.txt")
     parser.add_argument("--use_space_char", type=str2bool, default=True)
     parser.add_argument(
-        "--vis_font_path", type=str, default="./doc/fonts/simfang.ttf")
+        "--vis_font_path", type=str, default="/home/ubuntu/codespaces/temp/PaddleOCR/doc/fonts/simfang.ttf")
     parser.add_argument("--drop_score", type=float, default=0.5)
 
     # params for e2e
@@ -145,13 +145,18 @@ def init_args():
 
     parser.add_argument("--show_log", type=str2bool, default=True)
     parser.add_argument("--use_onnx", type=str2bool, default=False)
+    parser.add_argument("--use_local_onnx", type=str2bool, default=False)
+    parser.add_argument("--layout_onnx_path", type=str, default="/home/ubuntu/codespaces/temp/PaddleOCR/ppstructure/inference/picodet_lcnet_x1_0_layout_infer/model.onnx")
+    parser.add_argument("--det_onnx_path", type=str, default="/home/ubuntu/codespaces/temp/PaddleOCR/ppstructure/inference/ch_PP-OCRv3_det_infer/model.onnx")
+    parser.add_argument("--rec_onnx_path", type=str, default="/home/ubuntu/codespaces/temp/PaddleOCR/ppstructure/inference/ch_PP-OCRv3_rec_infer/model.onnx")
+
+    
     return parser
 
 
 def parse_args():
     parser = init_args()
     return parser.parse_args()
-
 
 def create_predictor(args, mode, logger):
     if mode == "det":

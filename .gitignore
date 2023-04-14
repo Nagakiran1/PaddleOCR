@@ -36,3 +36,6 @@ test_tipc/web/node_modules/
 
 ppstructure/inference/
 ppstructure/inference/*
+
+ppstructure_backup/inference/*
+ppstructure_backup/inference/

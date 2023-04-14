@@ -33,6 +33,9 @@ from ppocr.postprocess import build_post_process
 import json
 logger = get_logger()
 
+from ppstructure.triton_client import triton_repo
+
+
 
 class TextDetector(object):
     def __init__(self, args):
@@ -170,7 +173,20 @@ class TextDetector(object):
                 ],
                 warmup=2,
                 logger=logger)
+        
+        self.args = args
+        
+        if args.use_triton:
+            self.tc = triton_repo(
+                URL = args.triton_url,
+                model_name = 'det_onnx',
+                model_version = '1'
+                )
+        elif args.use_local_onnx:
+            import onnxruntime as rt
+            self.local_onnx_sess = rt.InferenceSession(args.det_onnx_path, providers=rt.get_available_providers())
 
+        
     def order_points_clockwise(self, pts):
         rect = np.zeros((4, 2), dtype="float32")
         s = pts.sum(axis=1)
@@ -234,7 +250,15 @@ class TextDetector(object):
 
         if self.args.benchmark:
             self.autolog.times.stamp()
-        if self.use_onnx:
+            
+        if self.args.use_triton:
+            res = self.tc.triton_inference(inputs={'image':img})
+            outputs = [res.as_numpy('sigmoid_0.tmp_0')]
+        elif self.args.use_local_onnx:
+            output_names = ['sigmoid_0.tmp_0']
+            res = self.local_onnx_sess.run(output_names, {'x': img.astype(np.float32)})
+            outputs = dict(zip(output_names, res))   
+        elif self.use_onnx:
             input_dict = {}
             input_dict[self.input_tensor.name] = img
             outputs = self.predictor.run(self.output_tensors, input_dict)

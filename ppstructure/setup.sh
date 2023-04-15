@@ -70,8 +70,8 @@ paddle2onnx --model_dir ./inference/ch_PP-OCRv3_rec_infer \
 --enable_onnx_checker True
 
 paddle2onnx --model_dir ./inference/ch_ppstructure_mobile_v2.0_SLANet_infer \
---model_filename ch_ppstructure_mobile_v2.0_SLANet_infer/inference.pdmodel \
---params_filename ch_ppstructure_mobile_v2.0_SLANet_infer/inference.pdiparams \
+--model_filename inference.pdmodel \
+--params_filename inference.pdiparams \
 --save_file ./inference/ch_ppstructure_mobile_v2.0_SLANet_infer/model.onnx \
 --opset_version 10 \
 --input_shape_dict="{'x':[-1,3,-1,-1]}" \

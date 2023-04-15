@@ -33,6 +33,9 @@ from ppocr.utils.utility import get_image_file_list, check_and_read
 from ppocr.utils.visual import draw_rectangle
 from ppstructure.utility import parse_args
 
+
+from triton_client import triton_repo
+
 logger = get_logger()
 
 
@@ -114,9 +117,13 @@ class TableStructurer(object):
             self.args = args
             self.tc = triton_repo(
                 URL = args.triton_url,
-                model_name = 'layout_onnx',
+                model_name = 'structure_onnx',
                 model_version = '1'
                 )
+        elif args.use_local_onnx:
+            import onnxruntime as rt
+            self.local_onnx_sess = rt.InferenceSession(args.table_onnx_path, providers=rt.get_available_providers())
+
 
     def __call__(self, img):
         starttime = time.time()
@@ -134,17 +141,20 @@ class TableStructurer(object):
         if self.args.benchmark:
             self.autolog.times.stamp()
         
+        
+        output_names = [
+            'p2o.fill_constant_15.tmp_0.1', 
+            'softmax_1.tmp_0'
+            ]
         if self.args.use_triton:
-            res = self.tc.triton_inference(inputs={'image':img})
-            output_names = ['transpose_0.tmp_0', 
-                            'transpose_2.tmp_0', 
-                            'transpose_4.tmp_0', 
-                            'transpose_6.tmp_0', 
-                            'transpose_1.tmp_0', 
-                            'transpose_3.tmp_0', 
-                            'transpose_5.tmp_0', 
-                            'transpose_7.tmp_0']
-        if self.use_onnx:
+            res = self.tc.triton_inference(inputs={'x':img}) # (1, 3, 488, 488)
+            outputs = [np.array(res.as_numpy(o_name).tolist()) for o_name in output_names]
+            
+        elif self.args.use_local_onnx:
+            res = self.local_onnx_sess.run(output_names, {'x': img.astype(np.float32)})
+            res = dict(zip(output_names, res))    
+      
+        elif self.use_onnx:
             input_dict = {}
             input_dict[self.input_tensor.name] = img
             outputs = self.predictor.run(self.output_tensors, input_dict)
@@ -155,8 +165,9 @@ class TableStructurer(object):
             for output_tensor in self.output_tensors:
                 output = output_tensor.copy_to_cpu()
                 outputs.append(output)
-            if self.args.benchmark:
-                self.autolog.times.stamp()
+                
+        if self.args.benchmark:
+            self.autolog.times.stamp()
 
         preds = {}
         preds['structure_probs'] = outputs[1]

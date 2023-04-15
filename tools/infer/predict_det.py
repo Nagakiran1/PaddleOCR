@@ -184,7 +184,7 @@ class TextDetector(object):
                 )
         elif args.use_local_onnx:
             import onnxruntime as rt
-            self.local_onnx_sess = rt.InferenceSession(args.det_onnx_path, providers=rt.get_available_providers())
+            self.local_onnx_sess = rt.InferenceSession(self.args.det_onnx_path, providers=rt.get_available_providers())
 
         
     def order_points_clockwise(self, pts):
@@ -252,12 +252,13 @@ class TextDetector(object):
             self.autolog.times.stamp()
             
         if self.args.use_triton:
-            res = self.tc.triton_inference(inputs={'image':img})
-            outputs = [res.as_numpy('sigmoid_0.tmp_0')]
+            res = self.tc.triton_inference(inputs={'x':img})
+            outputs = [np.asarray(res.as_numpy('sigmoid_0.tmp_0').tolist())]
         elif self.args.use_local_onnx:
             output_names = ['sigmoid_0.tmp_0']
-            res = self.local_onnx_sess.run(output_names, {'x': img.astype(np.float32)})
-            outputs = dict(zip(output_names, res))   
+            outputs = self.local_onnx_sess.run(['sigmoid_0.tmp_0'], {'x': img.astype(np.float32)})
+            #outputs = dict(zip(output_names, res))   
+            
         elif self.use_onnx:
             input_dict = {}
             input_dict[self.input_tensor.name] = img

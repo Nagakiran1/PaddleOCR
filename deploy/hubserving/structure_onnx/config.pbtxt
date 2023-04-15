@@ -1,0 +1,21 @@
+name: "structure_onnx"
+platform: "onnxruntime_onnx"
+input [
+  {
+    name: "x"
+    data_type: TYPE_FP32
+    dims: [ 1, 3, 488, 488 ]
+  }
+]
+output [
+  {
+    name: "p2o.fill_constant_15.tmp_0.1"
+    data_type: TYPE_FP32
+    dims: [ 1, 501, 8 ]
+  },
+  {
+    name: "softmax_1.tmp_0"
+    data_type: TYPE_FP32
+    dims: [ 1, 501, 50 ]
+  }
+]
